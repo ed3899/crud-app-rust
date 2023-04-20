@@ -9,6 +9,20 @@ async fn find_all() -> Result<HttpResponse, CustomError> {
     Ok(HttpResponse::Ok().json(employees))
 }
 
+#[get("/employees/{id}")]
+async fn find(id: web::Path<i32>) -> Result<HttpResponse, CustomError> {
+    let employee = Employees::find(id.into_inner())?;
+    Ok(HttpResponse::Ok().json(employee))
+}
+
+#[post("/employees")]
+async fn create(employee: web::Json<Employee>) -> Result<HttpResponse, CustomError> {
+    let employee = Employees::create(employee.into_inner())?;
+    Ok(HttpResponse::Ok().json(employee))
+}
+
 pub fn init_routes(config: &mut web::ServiceConfig) {
     config.service(find_all);
+    config.service(find);
+    config.service(create);
 }
