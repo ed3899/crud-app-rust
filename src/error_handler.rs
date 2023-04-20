@@ -1,5 +1,8 @@
+use actix_web::{http::StatusCode, ResponseError};
 use diesel::result::Error as DieselError;
 use serde::Deserialize;
+use serde_json::json;
+use std::fmt;
 
 #[derive(Debug, Deserialize)]
 pub struct CustomError {
@@ -25,5 +28,27 @@ impl From<DieselError> for CustomError {
             }
             err => CustomError::new(500, format!("Unknown Diesel error: {}", err)),
         }
+    }
+}
+
+impl fmt::Display for CustomError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.error_message.as_str())
+    }
+}
+
+impl ResponseError for CustomError {
+    fn error_response(&self) -> actix_web::HttpResponse {
+        let status_code = match StatusCode::from_u16(self.error_status_code) {
+            Ok(status_code) => status_code,
+            Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        };
+
+        let error_message = match status_code.as_u16() < 500 {
+            true => self.error_message.clone(),
+            false => "Internal server error".to_string(),
+        };
+
+        actix_web::HttpResponse::build(status_code).json(json!({ "message": error_message }))
     }
 }
