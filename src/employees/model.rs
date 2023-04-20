@@ -37,6 +37,16 @@ impl Employees {
         Ok(employee)
     }
 
+    pub fn create(employee: Employee) -> Result<Self, CustomError> {
+        let conn = db::connection()?;
+        let employee = Employee::from(employee);
+        let employee = diesel::insert_into(employees::table)
+            .values(employee)
+            .get_result(&conn);
+
+        Ok(employee)
+    }
+
     pub fn update(id: i32, employee: Employee) -> Result<Self, CustomError> {
         let conn = db::connection()?;
         let employee = diesel::update(employees::table)
