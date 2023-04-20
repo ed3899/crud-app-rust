@@ -42,7 +42,7 @@ impl Employees {
         let employee = Employee::from(employee);
         let employee = diesel::insert_into(employees::table)
             .values(employee)
-            .get_result(&conn);
+            .get_result(&conn)?;
 
         Ok(employee)
     }
