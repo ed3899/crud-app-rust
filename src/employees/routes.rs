@@ -5,8 +5,10 @@ use serde_json::json;
 
 #[get("/employees")]
 async fn find_all() -> Result<HttpResponse, CustomError> {
-  let employees = web::block(|| Employees::find_all()).await.unwrap();
-  Ok(HttpResponse::Ok().json(employees))
+    let employees = web::block(|| Employees::find_all()).await.unwrap();
+    Ok(HttpResponse::Ok().json(employees))
 }
 
-pub fn init_routes(config: &mut web::ServiceConfig) {}
+pub fn init_routes(config: &mut web::ServiceConfig) {
+    config.service(find_all);
+}
