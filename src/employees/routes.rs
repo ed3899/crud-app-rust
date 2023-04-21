@@ -21,8 +21,18 @@ async fn create(employee: web::Json<Employee>) -> Result<HttpResponse, CustomErr
     Ok(HttpResponse::Ok().json(employee))
 }
 
+#[put("/employees/{id}")]
+async fn update(
+    id: web::Path<i32>,
+    employee: web::Json<Employee>,
+) -> Result<HttpResponse, CustomError> {
+    let employee = Employees::update(id.into_inner(), employee.into_inner())?;
+    Ok(HttpResponse::Ok().json(employee))
+}
+
 pub fn init_routes(config: &mut web::ServiceConfig) {
     config.service(find_all);
     config.service(find);
     config.service(create);
+    config.service(update);
 }
