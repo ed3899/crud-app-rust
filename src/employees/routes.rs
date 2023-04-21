@@ -30,9 +30,16 @@ async fn update(
     Ok(HttpResponse::Ok().json(employee))
 }
 
+#[delete("/employees/{id}")]
+async fn delete(id: web::Path<i32>) -> Result<HttpResponse, CustomError> {
+    let deleted_employee = Employees::delete(id.into_inner())?;
+    Ok(HttpResponse::Ok().json(json!({"deleted": deleted_employee})))
+}
+
 pub fn init_routes(config: &mut web::ServiceConfig) {
     config.service(find_all);
     config.service(find);
     config.service(create);
     config.service(update);
+    config.service(delete);
 }
